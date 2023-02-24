@@ -1,9 +1,9 @@
 # K8 cluster
 resource "azurerm_kubernetes_cluster" "k8" {
-  name                = "example-aks1"
+  name                = "aks1"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  dns_prefix          = "exampleaks1"
+  dns_prefix          = "aks1"
 
   default_node_pool {
     name       = "default"
@@ -11,11 +11,9 @@ resource "azurerm_kubernetes_cluster" "k8" {
     vm_size    = "Standard_D2_v2"
   }
 
-  identity {
+ identity {
     type = "SystemAssigned"
   }
-
-  tags = {
-    Environment = "Production"
-  }
+  
+  depends_on = [azurerm_container_registry.acr]
 }
