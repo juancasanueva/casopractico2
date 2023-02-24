@@ -19,5 +19,23 @@ variable "public_key_path" {
 variable "ssh_user" {
   type = string
   description = "Usuario para hacer ssh"
-  default = "<SSH USER>"
+  default = "azureuser"
+}
+
+variable "network_name" {
+  type = string
+  description = "Nombre de la red"
+  default = "vnet1"
+}
+
+variable "subnet_name" {
+  type = string
+  description = "Nombre de la subred"
+  default = "subnet1"
+}
+
+variable "vm_size" {
+  type = string
+  description = "the VM size"
+  default = "Standard_F2"
 }
