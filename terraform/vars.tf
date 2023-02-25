@@ -4,7 +4,7 @@ variable "resource_group_name" {
   default = "casopractico2"
 }
 
-variable "location" {
+variable "location_name" {
   type = string
   description = "Región de Azure donde crearemos la infraestructura"
   default = "uksouth" 
