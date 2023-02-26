@@ -1,4 +1,4 @@
-# K8 cluster
+# AKS k8 cluster
 #resource "azurerm_kubernetes_cluster" "k8" {
 #  name                = "akscp2"
 #  location            = azurerm_resource_group.rg.location

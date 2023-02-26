@@ -1,4 +1,5 @@
-# $ ansible-playbook -i inventory playbook.yml
+# Playbook para configurar una aplicación web de Apache en una máquina virtual de Azure, corriendo con Podman 
+# y gestionado por systemd 
 ---
 - name: 'Applicación Web en Maquina Virtual de Azure, con Podman y gestionado por systemd'
   hosts: vm

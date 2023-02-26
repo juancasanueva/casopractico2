@@ -1,0 +1,31 @@
+# Playbook para Subir imagen de contenedor de MongoDB a un Container Registry de Azure
+---
+- name: 'Subir imagen de MongoDB a Container Registry de Azure'
+  hosts: vm
+  remote_user: azureuser
+  become: true
+  vars_files:
+    - vars/vars.yml
+  tasks:
+    - name: 'Hacer pull de la imagen de MongoDB'
+      containers.podman.podman_image:
+        name: "{{ aplicacion.imagen_original }}"
+
+    - name: 'Etiquetar la imagen de Mondodb'
+      containers.podman.podman_tag:
+        image: docker.io/bitnami/mongodb:latest
+        target_names:
+          - "{{ aplicacion.imagen }}"
+
+    - name: 'Autenticarse en el Registry de Azure'
+      containers.podman.podman_login:
+        username: "{{ azure_reg_user }}"
+        password: "{{ azure_reg_password }}"
+        registry: "{{ azure_reg }}"
+
+    - name: 'Subir la imagen de mongodb al Container Registry de Azure'
+      containers.podman.podman_image:
+        name: "{{ aplicacion.imagen }}"
+        push: yes
+        push_args:
+          dest: "{{ aplicacion.imagen }}"

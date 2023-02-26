@@ -1,26 +1,18 @@
-k8s_namespace: "ejemplo-05"
+k8s_namespace: "casopractico2"
 directorio_trabajo: "/tmp"
+azure_reg_user: crjuancasanueva
+azure_reg_password: '9O8JGIEg9aY2PSZosHPqeZAPJuTlh/FHdKPaWRu+GT+ACRAkT3f4'
+azure_reg: crjuancasanueva.azurecr.io
 aplicacion:
-  definicion: "stateless.yaml"
-  backend:
-    nombre: app-back 
-    imagen: mcr.microsoft.com/oss/bitnami/redis:6.0.8
-    replicas: 1
-    recursos:
-      cpu: 100m
-      memoria: 128Mi
-    limites:
-      cpu: 250m
-      memoria: 256Mi
-    puerto: 6379
-  frontend:
-    nombre: app-front
-    imagen: mcr.microsoft.com/azuredocs/azure-vote-front:v1
-    replicas: 1
-    recursos:
-      cpu: 100m
-      memoria: 128Mi
-    limites:
-      cpu: 250m
-      memoria: 256Mi
-    puerto: 80
+  definicion: "statefull.yml"
+  nombre: mongodb 
+  imagen_original: docker.io/bitnami/mongodb:latest
+  imagen: crjuancasanueva.azurecr.io/mongodb:casopractico2  
+  replicas: 1
+  recursos:
+    cpu: 100m
+    memoria: 128Mi
+  limites:
+    cpu: 250m
+    memoria: 256Mi
+  puerto: 6379

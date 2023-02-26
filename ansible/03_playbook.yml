@@ -1,6 +1,6 @@
-# fkdf
+# Playbook para desplegar un mongoDB en un cluster de AKS con almacenamiento persistente
 ---
-- name: 'Applicación MongoDB corriendo en un cluster de aks con almacenimiendo persistente'
+- name: 'Applicación MongoDB corriendo en un cluster de aks con almacenamiendo persistente'
   hosts: localhost
   vars_files:
     - vars/vars.yml
