@@ -1,44 +1,63 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ aplicacion.backend.nombre }}"
+  name: "{{ aplicacion.nombre }}"
   namespace: "{{ k8s_namespace }}"
 spec:
-  replicas: {{ aplicacion.backend.replicas }}
+  replicas: {{ aplicacion.replicas }}
   selector:
     matchLabels:
-      app: "{{ aplicacion.backend.nombre }}"
+      app: "{{ aplicacion.nombre }}"
   template:
     metadata:
       labels:
-        app: "{{ aplicacion.backend.nombre }}"
+        app: "{{ aplicacion.nombre }}"
     spec:
       nodeSelector:
         "kubernetes.io/os": linux
       containers:
-      - name: "{{ aplicacion.backend.nombre }}"
+      - name: "{{ aplicacion.nombre }}"
         image: "{{ aplicacion.imagen }}"
-        env:
-        - name: ALLOW_EMPTY_PASSWORD
-          value: "yes"
         resources:
           requests:
-            cpu: "{{ aplicacion.backend.recursos.cpu }}"
-            memory: "{{ aplicacion.backend.recursos.memoria }}"
+            cpu: "{{ aplicacion.recursos.cpu }}"
+            memory: "{{ aplicacion.recursos.memoria }}"
           limits:
-            cpu: "{{ aplicacion.backend.limites.cpu }}"
-            memory: "{{ aplicacion.backend.limites.memoria }}"
+            cpu: "{{ aplicacion.limites.cpu }}"
+            memory: "{{ aplicacion.limites.memoria }}"
         ports:
-        - containerPort: {{ aplicacion.backend.puerto }}
-          name: redis
+        - containerPort: {{ aplicacion.puerto }}
+          name: "{{ aplicacion.nombre }}"
+        volumeMounts:
+          - name: mongo-db
+            mountPath: /data/db
+      volumes:
+        - name: mongo-db
+          persistentVolumeClaim:
+            claimName: azure-managed-disk
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: "{{ aplicacion.backend.nombre }}"
+  name: "{{ aplicacion.nombre }}"
   namespace: "{{ k8s_namespace }}"
 spec:
+  type: LoadBalance
   ports:
-  - port: {{ aplicacion.backend.puerto }}
+    - port: {{ aplicacion.puerto }}
+      targetPort: {{ aplicacion.puerto }}
   selector:
-    app: "{{ aplicacion.backend.nombre }}"
+    app: "{{ aplicacion.nombre }}"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-managed-disk
+  namespace: "{{ k8s_namespace }}"
+spec:
+  storageClassName: managed-premium-retainfs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi

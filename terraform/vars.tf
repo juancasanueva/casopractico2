@@ -39,3 +39,21 @@ variable "vm_size" {
   description = "the VM size"
   default = "Standard_F2"
 }
+
+variable "container_registry" {
+  type        = string
+  description = "Name of Container Registry"
+  default     = "crjuancasanueva"
+}
+
+ variable "aks_cluster_name" {
+  type        = string
+  description = "AKS cluster name"
+  default     = "akscp2"
+ }
+
+ variable "aks_kubernetes_version" {
+  type        = string
+  description = "Kubernetes version"
+  default     = "1.26.0"
+}

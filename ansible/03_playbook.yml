@@ -5,7 +5,7 @@
   vars_files:
     - vars/vars.yml
   tasks:
-    - name: 'Definir los objectos deployment y servicios'
+    - name: 'Definir los objectos deployment, servicios, pvc, y pv'
       template:
         src: templates/statefull.j2
         dest: "{{ directorio_trabajo }}/{{ aplicacion.definicion }}"

@@ -15,4 +15,4 @@ aplicacion:
   limites:
     cpu: 250m
     memoria: 256Mi
-  puerto: 6379
+  puerto: 27017
