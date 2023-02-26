@@ -1,0 +1,155 @@
+# $ ansible-playbook -i inventory playbook.yml
+---
+- name: 'Applicación Web en Maquina Virtual de Azure, con Podman y gestionado por systemd'
+  hosts: vm
+  remote_user: azureuser
+  become: true
+  tasks:
+    - name: 'Instalar podman, skopeo, httpd-tools, openssl'
+      ansible.builtin.dnf:
+        name: 
+          - podman
+          - skopeo
+          - httpd-tools
+          - openssl
+        state: latest
+
+    - name: 'Crear un directorio de trabajo'
+      ansible.builtin.file:
+        path: ./webserver
+        state: directory
+        owner: azureuser
+        group: azureuser
+        mode: '0777'
+
+    - name: 'Instalar la libreria de python passlib'
+      ansible.builtin.pip:
+        name: passlib
+
+    - name: 'Crear el fichero de credenciales para la autenticación básica en el servidor Web.'
+      community.general.htpasswd:
+        path: ./webserver/.creds
+        name: usertest
+        password: 'test'
+        owner: azureuser
+        group: azureuser
+        mode: 0664
+
+    - name: 'Crear clave privada para el certificado (2048 bits, RSA)'
+      community.crypto.openssl_privatekey:
+        path: ./webserver/localhost.key
+        size: 2048
+        owner: azureuser
+        group: azureuser
+        mode: 0664
+
+    - name: 'Crear la petición de firma del certificado'
+      community.crypto.openssl_csr:
+        path: ./webserver/localhost.csr
+        privatekey_path: ./webserver/localhost.key
+        country_name: ES
+        state_or_province_name: Madrid
+        locality_name: Madrid
+        organization_name: DevOps
+        organizational_unit_name: cp2
+        common_name: vm1
+        owner: azureuser
+        group: azureuser
+        mode: 0664
+
+    - name: 'Crear certificado utilizando la clave privada y la petición de firma'
+      community.crypto.x509_certificate:
+        path: ./webserver/localhost.crt
+        privatekey_path: ./webserver/localhost.key
+        csr_path: ./webserver/localhost.csr
+        provider: selfsigned
+        owner: azureuser
+        group: azureuser
+        mode: 0664
+
+    - name: 'Definir la página principal del servidor Web'
+      ansible.builtin.copy:
+        src: ./webserver_files/index.html
+        dest: ./webserver/index.html
+        owner: azureuser
+        group: azureuser
+        mode: 0664
+
+    - name: 'Definir la configuración del servidor Web'
+      ansible.builtin.copy:
+        src: ./webserver_files/httpd.conf
+        dest: ./webserver/httpd.conf
+        owner: azureuser
+        group: azureuser
+        mode: 0664
+
+    - name: 'Establecer la configuración de autenticación básica'
+      ansible.builtin.copy:
+        src: ./webserver_files/.htaccess
+        dest: ./webserver/.htaccess
+        owner: azureuser
+        group: azureuser
+        mode: 0664
+
+    - name: 'Definir el fichero para la creación de la imagen del contenedor'
+      ansible.builtin.copy:
+        src: ./webserver_files/Containerfile
+        dest: ./webserver/Containerfile
+        owner: azureuser
+        group: azureuser
+        mode: 0664
+
+    - name: 'Generar la imagen del contenedor'
+      containers.podman.podman_image:
+        name: webserver
+        path: ./webserver
+
+    - name: 'Etiquetar la imagen del contenedor'
+      containers.podman.podman_tag:
+        image: localhost/webserver:latest
+        target_names:
+          - crjuancasanueva.azurecr.io/webserver:casopractico2
+
+    - name: 'Autenticarse en el Registry de Azure'
+      containers.podman.podman_login:
+        username: crjuancasanueva
+        password: '9O8JGIEg9aY2PSZosHPqeZAPJuTlh/FHdKPaWRu+GT+ACRAkT3f4'
+        registry: crjuancasanueva.azurecr.io
+
+    - name: 'Subir la imagen del contenedor al Registry de Azure'
+      containers.podman.podman_image:
+        name: crjuancasanueva.azurecr.io/webserver:casopractico2
+        push: yes
+        push_args:
+          dest: crjuancasanueva.azurecr.io/webserver:casopractico2
+
+    - name: 'Crear el contenedor del servicio Web a partir de la imagen en el Azure Registry'
+      containers.podman.podman_container:
+        name: web
+        image: crjuancasanueva.azurecr.io/webserver:casopractico2
+        state: created
+        ports:
+          - "8080:443"
+
+    - name: 'Generar los ficheros para gestionar el contenedor a través de systemd'
+      containers.podman.podman_generate_systemd:
+          name: web
+          new: true
+          dest: ./webserver
+
+    - name: 'Copiar los ficheros generados en el paso previo al directorio de systemd'
+      ansible.builtin.copy:
+        remote_src: true
+        src: ./webserver/container-web.service
+        dest: /etc/systemd/system/container-web.service
+
+    - name: 'Recargar la configuración de systemd'
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: 'Iniciar la aplicación Web desde systemd'
+      ansible.builtin.systemd:
+        name: container-web.service
+        enabled: true
+        state: started
+
