@@ -8,7 +8,7 @@
     - name: 'Definir los objectos deployment, servicios, pvc, y pv'
       template:
         src: templates/statefull.j2
-        dest: "{{ directorio_trabajo }}/{{ aplicacion.definicion }}"
+        dest: "{{ aplicacion.directorio_trabajo }}/{{ aplicacion.definicion }}"
 
     - name: 'Crear el namespace de trabajo'
       kubernetes.core.k8s:
@@ -18,4 +18,4 @@
     - name: 'Crear Deployments y servicios de la aplicación'
       kubernetes.core.k8s:
         state: present
-        template: "{{ directorio_trabajo }}/{{ aplicacion.definicion }}"
+        template: "{{ aplicacion.directorio_trabajo }}/{{ aplicacion.definicion }}"

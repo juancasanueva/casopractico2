@@ -21,7 +21,7 @@
 
     - name: 'Crear un directorio de trabajo'
       ansible.builtin.file:
-        path: ./webserver
+        path: "{{ webserver.directorio_trabajo }}"
         state: directory
 
     - name: 'Instalar la libreria de python passlib'
@@ -33,19 +33,19 @@
 
     - name: 'Crear el fichero de credenciales para la autenticación básica en el servidor Web.'
       community.general.htpasswd:
-        path: ./webserver/.creds
+        path: "{{ webserver.directorio_trabajo }}/.creds"
         name: usertest
         password: 'test'
 
     - name: 'Crear clave privada para el certificado (2048 bits, RSA)'
       community.crypto.openssl_privatekey:
-        path: ./webserver/localhost.key
+        path: "{{ webserver.directorio_trabajo }}/localhost.key"
         size: 2048
 
     - name: 'Crear la petición de firma del certificado'
       community.crypto.openssl_csr:
-        path: ./webserver/localhost.csr
-        privatekey_path: ./webserver/localhost.key
+        path: "{{ webserver.directorio_trabajo }}/localhost.csr"
+        privatekey_path: "{{ webserver.directorio_trabajo }}/localhost.key"
         country_name: ES
         state_or_province_name: Madrid
         locality_name: Madrid
@@ -55,30 +55,30 @@
 
     - name: 'Crear certificado utilizando la clave privada y la petición de firma'
       community.crypto.x509_certificate:
-        path: ./webserver/localhost.crt
-        privatekey_path: ./webserver/localhost.key
-        csr_path: ./webserver/localhost.csr
+        path: "{{ webserver.directorio_trabajo }}/localhost.crt"
+        privatekey_path: "{{ webserver.directorio_trabajo }}/localhost.key"
+        csr_path: "{{ webserver.directorio_trabajo }}/localhost.csr"
         provider: selfsigned
 
     - name: 'Definir la página principal del servidor Web'
       ansible.builtin.copy:
         src: ./webserver_files/index.html
-        dest: ./webserver/index.html
+        dest: "{{ webserver.directorio_trabajo }}/index.html"
 
     - name: 'Definir la configuración del servidor Web'
       ansible.builtin.copy:
         src: ./webserver_files/httpd.conf
-        dest: ./webserver/httpd.conf
+        dest: "{{ webserver.directorio_trabajo }}/httpd.conf"
 
     - name: 'Establecer la configuración de autenticación básica'
       ansible.builtin.copy:
         src: ./webserver_files/.htaccess
-        dest: ./webserver/.htaccess
+        dest: "{{ webserver.directorio_trabajo }}/.htaccess"
 
     - name: 'Definir el fichero para la creación de la imagen del contenedor'
       ansible.builtin.copy:
         src: ./webserver_files/Containerfile
-        dest: ./webserver/Containerfile
+        dest: "{{ webserver.directorio_trabajo }}/Containerfile"
 
     - name: 'Generar la imagen del contenedor'
       become: true
@@ -86,7 +86,7 @@
       become_method: sudo
       containers.podman.podman_image:
         name: webserver
-        path: ./webserver
+        path: "{{ webserver.directorio_trabajo }}"
 
     - name: 'Etiquetar la imagen del contenedor'
       become: true
@@ -121,7 +121,7 @@
       become_user: root
       become_method: sudo
       containers.podman.podman_container:
-        name: web
+        name: "{{ webserver.container_name }}"
         image: "{{ webserver.imagen }}"
         state: created
         ports:
@@ -132,9 +132,9 @@
       become_user: root
       become_method: sudo
       containers.podman.podman_generate_systemd:
-          name: web
+          name: "{{ webserver.container_name }}"
           new: true
-          dest: ./webserver
+          dest: "{{ webserver.directorio_trabajo }}"
 
     - name: 'Copiar los ficheros generados en el paso previo al directorio de systemd'
       become: true
@@ -142,7 +142,7 @@
       become_method: sudo
       ansible.builtin.copy:
         remote_src: true
-        src: ./webserver/container-web.service
+        src: "{{ webserver.directorio_trabajo }}/container-web.service"
         dest: /etc/systemd/system/container-web.service
 
     - name: 'Recargar la configuración de systemd'

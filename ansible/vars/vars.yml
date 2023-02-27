@@ -1,12 +1,14 @@
 k8s_namespace: "casopractico2"
-directorio_trabajo: "/tmp"
 azure_reg_user: crjuancasanueva
 azure_reg_password: '9O8JGIEg9aY2PSZosHPqeZAPJuTlh/FHdKPaWRu+GT+ACRAkT3f4'
 azure_reg: crjuancasanueva.azurecr.io
 webserver:
+  directorio_trabajo: "./webserver"
   imagen: crjuancasanueva.azurecr.io/webserver:casopractico2
+  container_name: web
 aplicacion:
   definicion: "statefull.yml"
+  directorio_trabajo: "/tmp"
   nombre: mongodb 
   imagen_original: docker.io/bitnami/mongodb:latest
   imagen: crjuancasanueva.azurecr.io/mongodb:casopractico2
