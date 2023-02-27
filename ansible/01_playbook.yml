@@ -5,6 +5,8 @@
   hosts: vm
   remote_user: azureuser
   become: true
+  vars_files:
+    - vars/vars.yml
   tasks:
     - name: 'Instalar podman, skopeo, httpd-tools, openssl'
       ansible.builtin.dnf:
@@ -109,25 +111,25 @@
       containers.podman.podman_tag:
         image: localhost/webserver:latest
         target_names:
-          - crjuancasanueva.azurecr.io/webserver:casopractico2
+          - "{{ webserver.imagen }}"
 
     - name: 'Autenticarse en el Registry de Azure'
       containers.podman.podman_login:
-        username: crjuancasanueva
-        password: '9O8JGIEg9aY2PSZosHPqeZAPJuTlh/FHdKPaWRu+GT+ACRAkT3f4'
-        registry: crjuancasanueva.azurecr.io
+        username: "{{ azure_reg_user }}"
+        password: "{{ azure_reg_password }}"
+        registry: "{{ azure_reg }}"
 
     - name: 'Subir la imagen del contenedor al Registry de Azure'
       containers.podman.podman_image:
-        name: crjuancasanueva.azurecr.io/webserver:casopractico2
+        name: "{{ webserver.imagen }}"
         push: yes
         push_args:
-          dest: crjuancasanueva.azurecr.io/webserver:casopractico2
+          dest: "{{ webserver.imagen }}"
 
     - name: 'Crear el contenedor del servicio Web a partir de la imagen en el Azure Registry'
       containers.podman.podman_container:
         name: web
-        image: crjuancasanueva.azurecr.io/webserver:casopractico2
+        image: "{{ webserver.imagen }}"
         state: created
         ports:
           - "8080:443"

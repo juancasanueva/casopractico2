@@ -3,6 +3,8 @@ directorio_trabajo: "/tmp"
 azure_reg_user: crjuancasanueva
 azure_reg_password: '9O8JGIEg9aY2PSZosHPqeZAPJuTlh/FHdKPaWRu+GT+ACRAkT3f4'
 azure_reg: crjuancasanueva.azurecr.io
+webserver:
+  imagen: crjuancasanueva.azurecr.io/webserver:casopractico2
 aplicacion:
   definicion: "statefull.yml"
   nombre: mongodb 

@@ -14,7 +14,7 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes     = ["10.0.2.0/24"]
 }
 
-# The Public IP Address
+# The Public IP Address for the VM
 resource "azurerm_public_ip" "pip" {
   name                = "public-ip"
   resource_group_name = azurerm_resource_group.rg.name

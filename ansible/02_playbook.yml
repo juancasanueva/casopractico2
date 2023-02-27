@@ -1,4 +1,4 @@
-# Playbook para Subir imagen de contenedor de MongoDB a un Container Registry de Azure
+# Playbook para subir imagen de contenedor de MongoDB a un Container Registry de Azure
 ---
 - name: 'Subir imagen de MongoDB a Container Registry de Azure'
   hosts: vm
@@ -13,7 +13,7 @@
 
     - name: 'Etiquetar la imagen de Mondodb'
       containers.podman.podman_tag:
-        image: docker.io/bitnami/mongodb:latest
+        image: "{{ aplicacion.imagen_original }}"
         target_names:
           - "{{ aplicacion.imagen }}"
 
