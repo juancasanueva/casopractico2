@@ -4,11 +4,13 @@
 - name: 'Applicación Web en Maquina Virtual de Azure, con Podman y gestionado por systemd'
   hosts: vm
   remote_user: azureuser
-  become: true
   vars_files:
     - vars/vars.yml
   tasks:
     - name: 'Instalar podman, skopeo, httpd-tools, openssl'
+      become: true
+      become_user: root
+      become_method: sudo
       ansible.builtin.dnf:
         name: 
           - podman
@@ -21,11 +23,11 @@
       ansible.builtin.file:
         path: ./webserver
         state: directory
-        owner: azureuser
-        group: azureuser
-        mode: '0777'
 
     - name: 'Instalar la libreria de python passlib'
+      become: true
+      become_user: root
+      become_method: sudo
       ansible.builtin.pip:
         name: passlib
 
@@ -34,17 +36,11 @@
         path: ./webserver/.creds
         name: usertest
         password: 'test'
-        owner: azureuser
-        group: azureuser
-        mode: 0664
 
     - name: 'Crear clave privada para el certificado (2048 bits, RSA)'
       community.crypto.openssl_privatekey:
         path: ./webserver/localhost.key
         size: 2048
-        owner: azureuser
-        group: azureuser
-        mode: 0664
 
     - name: 'Crear la petición de firma del certificado'
       community.crypto.openssl_csr:
@@ -56,9 +52,6 @@
         organization_name: DevOps
         organizational_unit_name: cp2
         common_name: vm1
-        owner: azureuser
-        group: azureuser
-        mode: 0664
 
     - name: 'Crear certificado utilizando la clave privada y la petición de firma'
       community.crypto.x509_certificate:
@@ -66,60 +59,57 @@
         privatekey_path: ./webserver/localhost.key
         csr_path: ./webserver/localhost.csr
         provider: selfsigned
-        owner: azureuser
-        group: azureuser
-        mode: 0664
 
     - name: 'Definir la página principal del servidor Web'
       ansible.builtin.copy:
         src: ./webserver_files/index.html
         dest: ./webserver/index.html
-        owner: azureuser
-        group: azureuser
-        mode: 0664
 
     - name: 'Definir la configuración del servidor Web'
       ansible.builtin.copy:
         src: ./webserver_files/httpd.conf
         dest: ./webserver/httpd.conf
-        owner: azureuser
-        group: azureuser
-        mode: 0664
 
     - name: 'Establecer la configuración de autenticación básica'
       ansible.builtin.copy:
         src: ./webserver_files/.htaccess
         dest: ./webserver/.htaccess
-        owner: azureuser
-        group: azureuser
-        mode: 0664
 
     - name: 'Definir el fichero para la creación de la imagen del contenedor'
       ansible.builtin.copy:
         src: ./webserver_files/Containerfile
         dest: ./webserver/Containerfile
-        owner: azureuser
-        group: azureuser
-        mode: 0664
 
     - name: 'Generar la imagen del contenedor'
+      become: true
+      become_user: root
+      become_method: sudo
       containers.podman.podman_image:
         name: webserver
         path: ./webserver
 
     - name: 'Etiquetar la imagen del contenedor'
+      become: true
+      become_user: root
+      become_method: sudo
       containers.podman.podman_tag:
         image: localhost/webserver:latest
         target_names:
           - "{{ webserver.imagen }}"
 
     - name: 'Autenticarse en el Registry de Azure'
+      become: true
+      become_user: root
+      become_method: sudo
       containers.podman.podman_login:
         username: "{{ azure_reg_user }}"
         password: "{{ azure_reg_password }}"
         registry: "{{ azure_reg }}"
 
     - name: 'Subir la imagen del contenedor al Registry de Azure'
+      become: true
+      become_user: root
+      become_method: sudo
       containers.podman.podman_image:
         name: "{{ webserver.imagen }}"
         push: yes
@@ -127,6 +117,9 @@
           dest: "{{ webserver.imagen }}"
 
     - name: 'Crear el contenedor del servicio Web a partir de la imagen en el Azure Registry'
+      become: true
+      become_user: root
+      become_method: sudo
       containers.podman.podman_container:
         name: web
         image: "{{ webserver.imagen }}"
@@ -135,22 +128,34 @@
           - "8080:443"
 
     - name: 'Generar los ficheros para gestionar el contenedor a través de systemd'
+      become: true
+      become_user: root
+      become_method: sudo
       containers.podman.podman_generate_systemd:
           name: web
           new: true
           dest: ./webserver
 
     - name: 'Copiar los ficheros generados en el paso previo al directorio de systemd'
+      become: true
+      become_user: root
+      become_method: sudo
       ansible.builtin.copy:
         remote_src: true
         src: ./webserver/container-web.service
         dest: /etc/systemd/system/container-web.service
 
     - name: 'Recargar la configuración de systemd'
+      become: true
+      become_user: root
+      become_method: sudo
       ansible.builtin.systemd:
         daemon_reload: true
 
     - name: 'Iniciar la aplicación Web desde systemd'
+      become: true
+      become_user: root
+      become_method: sudo
       ansible.builtin.systemd:
         name: container-web.service
         enabled: true
