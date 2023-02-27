@@ -18,6 +18,13 @@ spec:
       containers:
       - name: "{{ aplicacion.nombre }}"
         image: "{{ aplicacion.imagen }}"
+        env:
+        - name: MONGODB_ROOT_USER
+          value: "{{ root_user }}"
+        - name: MONGODB_ROOT_PASSWORD
+          value: "{{ root_password }}"
+        - name: MONGODB_DATABASE
+          value: "{{ database_name }}"
         resources:
           requests:
             cpu: "{{ aplicacion.recursos.cpu }}"
@@ -30,7 +37,7 @@ spec:
           name: "{{ aplicacion.nombre }}"
         volumeMounts:
           - name: mongo-db
-            mountPath: /data/db
+            mountPath: "{{ mount_path }}"
       volumes:
         - name: mongo-db
           persistentVolumeClaim:
@@ -42,7 +49,7 @@ metadata:
   name: "{{ aplicacion.nombre }}"
   namespace: "{{ k8s_namespace }}"
 spec:
-  type: LoadBalance
+  type: LoadBalancer
   ports:
     - port: {{ aplicacion.puerto }}
       targetPort: {{ aplicacion.puerto }}

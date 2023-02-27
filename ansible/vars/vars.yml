@@ -9,7 +9,11 @@ aplicacion:
   definicion: "statefull.yml"
   nombre: mongodb 
   imagen_original: docker.io/bitnami/mongodb:latest
-  imagen: crjuancasanueva.azurecr.io/mongodb:casopractico2  
+  imagen: crjuancasanueva.azurecr.io/mongodb:casopractico2
+  root_user: admin
+  root_password: admin1234
+  database_name: my_database
+  mount_path: /bitnami/mongodb
   replicas: 1
   recursos:
     cpu: 100m
