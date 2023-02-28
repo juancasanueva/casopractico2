@@ -34,8 +34,8 @@
     - name: 'Crear el fichero de credenciales para la autenticación básica en el servidor Web.'
       community.general.htpasswd:
         path: "{{ webserver.directorio_trabajo }}/.creds"
-        name: usertest
-        password: 'test'
+        name: "{{ webserver.user_name }}"
+        password: "{{ webserver.user_password }}"
 
     - name: 'Crear clave privada para el certificado (2048 bits, RSA)'
       community.crypto.openssl_privatekey:
@@ -46,12 +46,12 @@
       community.crypto.openssl_csr:
         path: "{{ webserver.directorio_trabajo }}/localhost.csr"
         privatekey_path: "{{ webserver.directorio_trabajo }}/localhost.key"
-        country_name: ES
-        state_or_province_name: Madrid
-        locality_name: Madrid
-        organization_name: DevOps
-        organizational_unit_name: cp2
-        common_name: vm1
+        country_name: "{{ ssl.country_name }}"
+        state_or_province_name: "{{ ssl.state_or_province_name }}"
+        locality_name: "{{ ssl.locality_name }}"
+        organization_name: "{{ ssl.organization_name }}"
+        organizational_unit_name: "{{ ssl.organizational_unit_name }}"
+        common_name: "{{ ssl.common_name }}"
 
     - name: 'Crear certificado utilizando la clave privada y la petición de firma'
       community.crypto.x509_certificate:
@@ -142,8 +142,8 @@
       become_method: sudo
       ansible.builtin.copy:
         remote_src: true
-        src: "{{ webserver.directorio_trabajo }}/container-web.service"
-        dest: /etc/systemd/system/container-web.service
+        src: "{{ webserver.directorio_trabajo }}/container-{{ webserver.container_name }}.service"
+        dest: "/etc/systemd/system/container-{{ webserver.container_name }}.service"
 
     - name: 'Recargar la configuración de systemd'
       become: true
@@ -157,7 +157,7 @@
       become_user: root
       become_method: sudo
       ansible.builtin.systemd:
-        name: container-web.service
+        name: "container-{{ webserver.container_name }}.service"
         enabled: true
         state: started
 
