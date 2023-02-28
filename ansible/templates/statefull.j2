@@ -20,11 +20,11 @@ spec:
         image: "{{ aplicacion.imagen }}"
         env:
         - name: MONGODB_ROOT_USER
-          value: "{{ root_user }}"
+          value: "{{ aplicacion.root_user }}"
         - name: MONGODB_ROOT_PASSWORD
-          value: "{{ root_password }}"
+          value: "{{ aplicacion.root_password }}"
         - name: MONGODB_DATABASE
-          value: "{{ database_name }}"
+          value: "{{ aplicacion.database_name }}"
         resources:
           requests:
             cpu: "{{ aplicacion.recursos.cpu }}"
@@ -36,10 +36,10 @@ spec:
         - containerPort: {{ aplicacion.puerto }}
           name: "{{ aplicacion.nombre }}"
         volumeMounts:
-          - name: mongo-db
-            mountPath: "{{ mount_path }}"
+          - name: "{{ aplicacion.nombre }}"
+            mountPath: "{{ aplicacion.mount_path }}"
       volumes:
-        - name: mongo-db
+        - name: "{{ aplicacion.nombre }}"
           persistentVolumeClaim:
             claimName: azure-managed-disk
 ---

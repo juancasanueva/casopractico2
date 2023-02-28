@@ -12,9 +12,18 @@ resource "azurerm_kubernetes_cluster" "k8" {
     vm_size    = "Standard_D2_v2"
   }
 
- identity {
+  # Azure will assign the id automatically
+  identity {
     type = "SystemAssigned"
   }
+}
+
+# add the AcrPull role to the k8 cluster so that it can pull images from the ACR
+resource "azurerm_role_assignment" "k8_to_acr" {
+  scope                             = azurerm_container_registry.acr.id
+  role_definition_name              = "AcrPull"
+  principal_id                      = azurerm_kubernetes_cluster.k8.kubelet_identity[0].object_id
+  skip_service_principal_aad_check  = true
 }
 
 # Save the kube.conf file so that we can connect with kubectl

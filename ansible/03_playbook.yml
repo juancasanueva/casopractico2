@@ -5,23 +5,17 @@
   vars_files:
     - vars/vars.yml
   tasks:
-    - name: 'Definir los objectos deployment, servicios, pvc, y pv'
+    - name: 'Definir los objectos deployment, servicios, y pvc'
       template:
         src: templates/statefull.j2
         dest: "{{ aplicacion.directorio_trabajo }}/{{ aplicacion.definicion }}"
 
-    - name: 'Crear el namespace de trabajo'
-      kubernetes.core.k8s:
-        kind: Namespace
-        name: "{{ k8s_namespace }}"
+   # - name: 'Crear el namespace de trabajo'
+   #   kubernetes.core.k8s:
+   #     kind: Namespace
+   #     name: "{{ k8s_namespace }}"
 
-    - name: 'Autenticarse en el Registry de Azure'
-      containers.podman.podman_login:
-        username: "{{ azure_reg_user }}"
-        password: "{{ azure_reg_password }}"
-        registry: "{{ azure_reg }}"
-
-    - name: 'Crear Deployments y servicios de la aplicación'
-      kubernetes.core.k8s:
-        state: present
-        template: "{{ aplicacion.directorio_trabajo }}/{{ aplicacion.definicion }}"
+   # - name: 'Crear Deployments y servicios de la aplicación'
+   #   kubernetes.core.k8s:
+   #     state: present
+   #     template: "{{ aplicacion.directorio_trabajo }}/{{ aplicacion.definicion }}"
