@@ -28,7 +28,9 @@
 
 6. Update the Ansible inventory file (found inside the Ansible folder) with the public IP address of the Azure Virtual Machine created in step 4.
 
-7.  Configure the infrastructure and deploy the applications with Ansible by running the following script:
+7. Update the Azure Container Resgitry name (azure_reg), user (azure_reg_user) and password (azure_reg_password) in the vars.yml file found in the ansible/vars folder.
+
+8.  Configure the infrastructure and deploy the applications with Ansible by running the following script:
 
 ```console
 ~/ansible$ ./deploy.sh
