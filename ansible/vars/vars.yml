@@ -1,4 +1,6 @@
 k8s_namespace: "casopractico2"
+aks_context: "akscp2"
+aks_kube_config: "../terraform/kube.conf"
 azure_reg_user: crjuancasanueva
 azure_reg_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
@@ -32,7 +34,7 @@ aplicacion:
   root_user: admin
   root_password: admin1234
   database_name: my_database
-  mount_path: /bitnami/mongodb
+  mount_path: "/bitnami/mongodb"
   replicas: 1
   recursos:
     cpu: 100m
@@ -40,4 +42,5 @@ aplicacion:
   limites:
     cpu: 250m
     memoria: 256Mi
+  storage: 1Gi  
   puerto: 27017

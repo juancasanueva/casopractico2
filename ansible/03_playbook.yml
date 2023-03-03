@@ -9,13 +9,21 @@
       template:
         src: templates/statefull.j2
         dest: "{{ aplicacion.directorio_trabajo }}/{{ aplicacion.definicion }}"
+    
+    - name: 'Instalar la libreria de python kubernetes'
+      ansible.builtin.pip:
+        name: kubernetes
 
-   # - name: 'Crear el namespace de trabajo'
-   #   kubernetes.core.k8s:
-   #     kind: Namespace
-   #     name: "{{ k8s_namespace }}"
+    - name: 'Crear el namespace de trabajo en AKS'
+      kubernetes.core.k8s:
+        kubeconfig: "{{ aks_kube_config }}"
+        context: "{{ aks_context }}"
+        kind: Namespace
+        name: "{{ k8s_namespace }}"
 
-   # - name: 'Crear Deployments y servicios de la aplicación'
-   #   kubernetes.core.k8s:
-   #     state: present
-   #     template: "{{ aplicacion.directorio_trabajo }}/{{ aplicacion.definicion }}"
+    - name: 'Crear Deployment, Service y PersistentVolumeClaim de la aplicación en AKS'
+      kubernetes.core.k8s:
+        kubeconfig: "{{ aks_kube_config }}"
+        context: "{{ aks_context }}"
+        state: present
+        template: "{{ aplicacion.directorio_trabajo }}/{{ aplicacion.definicion }}"

@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: "{{ aplicacion.nombre }}"
   namespace: "{{ k8s_namespace }}"
+  labels:
+    name: "{{ aplicacion.nombre }}"
 spec:
   replicas: {{ aplicacion.replicas }}
   selector:
@@ -36,10 +38,10 @@ spec:
         - containerPort: {{ aplicacion.puerto }}
           name: "{{ aplicacion.nombre }}"
         volumeMounts:
-          - name: "{{ aplicacion.nombre }}"
+          - name: volume
             mountPath: "{{ aplicacion.mount_path }}"
       volumes:
-        - name: "{{ aplicacion.nombre }}"
+        - name: volume
           persistentVolumeClaim:
             claimName: azure-managed-disk
 ---
@@ -62,9 +64,9 @@ metadata:
   name: azure-managed-disk
   namespace: "{{ k8s_namespace }}"
 spec:
-  storageClassName: managed-premium-retainfs
+  storageClassName: default
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
+      storage: "{{ aplicacion.storage }}"
