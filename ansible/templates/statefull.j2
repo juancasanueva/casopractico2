@@ -21,12 +21,10 @@ spec:
       - name: "{{ aplicacion.nombre }}"
         image: "{{ aplicacion.imagen }}"
         env:
-        - name: MONGODB_ROOT_USER
+        - name: MONGO_INITDB_ROOT_USERNAME
           value: "{{ aplicacion.root_user }}"
-        - name: MONGODB_ROOT_PASSWORD
+        - name: MONGO_INITDB_ROOT_PASSWORD
           value: "{{ aplicacion.root_password }}"
-        - name: MONGODB_DATABASE
-          value: "{{ aplicacion.database_name }}"
         resources:
           requests:
             cpu: "{{ aplicacion.recursos.cpu }}"
