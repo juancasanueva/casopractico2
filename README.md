@@ -1,4 +1,7 @@
-# Caso Practico 2
+# Caso Practico 2: Deployment Automation in Cloud Environment
+
+## Purpose
+Create intrastructure in **Azure** using the infrastructure as Code (IaC) model with **Terraform**, and automating the configuration of the infrastructure and deployment of applications using **Ansible**.
 
 ## Deployment
 
@@ -34,4 +37,11 @@
 
 ```console
 ~/ansible$ ./deploy.sh
+```
+
+## Destroy Infrastructure
+
+To destroy the Azure Infraestructure deployed with **Terraform**, run the following command:
+```console
+~/terraform$ terraform destroy
 ```
