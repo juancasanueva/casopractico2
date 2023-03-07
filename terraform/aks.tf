@@ -1,4 +1,4 @@
-# AKS k8 cluster
+# Create an AKS k8 cluster
 resource "azurerm_kubernetes_cluster" "k8" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location

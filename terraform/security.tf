@@ -1,4 +1,4 @@
-# The Network Security Group with the SSH Rule
+# The Network Security Group with the SSH and HTTP security rules
 resource "azurerm_network_security_group" "secgroup" {
   name                = "security-group"
   location            = azurerm_resource_group.rg.location
@@ -28,7 +28,7 @@ resource "azurerm_network_security_group" "secgroup" {
   }
 }
 
-# Association of the NEtwork Security Group to the Subnet
+# Association of the Network Security Group to the Subnet
 resource "azurerm_subnet_network_security_group_association" "nsg-link" {
   subnet_id                 = azurerm_subnet.subnet.id
   network_security_group_id = azurerm_network_security_group.secgroup.id

@@ -1,36 +1,36 @@
 variable "resource_group_name" {
   type = string
-  description = "Nombre del Resource Group"
+  description = "Resource Group name"
   default = "casopractico2"
 }
 
 variable "location_name" {
   type = string
-  description = "Región de Azure donde crearemos la infraestructura"
+  description = "Azure Region where the infrastructure wil be created"
   default = "uksouth" 
 }
 
 variable "public_key_path" {
   type = string
-  description = "Ruta para la clave pública de acceso a las instancias"
+  description = "Path to public key to access intances with SSH"
   default = "~/.ssh/id_rsa.pub"
 }
 
 variable "ssh_user" {
   type = string
-  description = "Usuario para hacer ssh"
+  description = "User for ssh"
   default = "azureuser"
 }
 
 variable "network_name" {
   type = string
-  description = "Nombre de la red"
+  description = "Network name"
   default = "vnet1"
 }
 
 variable "subnet_name" {
   type = string
-  description = "Nombre de la subred"
+  description = "Subnet name"
   default = "subnet1"
 }
 
